@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Terarchy - Invoice Tokenization Platform
+
+Terarchy is a blockchain-based platform for invoice tokenization and financing. It transforms traditional invoices into digital tokens, enabling faster financing, transparent tracking, and secure transactions between suppliers, buyers, and financiers.
+
+## Key Features
+
+- **Invoice Management**: Create, submit, approve/reject, and track invoices
+- **Tokenization**: Convert approved invoices into digital tokens (simulated blockchain integration)
+- **Financing Marketplace**: Connect suppliers with financiers for invoice financing
+- **Risk Assessment**: Advanced scoring system to evaluate invoice risk
+- **KYC/KYB/AML**: Identity verification for all users with additional checks for financiers
+- **Role-Based Access**: Dedicated workflows for suppliers, buyers, and financiers
+
+## Technology Stack
+
+- **Frontend**: Next.js 15, React 19, Tailwind CSS 4, shadcn/ui
+- **Backend**: Node.js with Next.js API routes (tRPC)
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js with email and credentials providers
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and npm
+- PostgreSQL database
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/Terarchy/core_v2.git
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables:
+
+Copy the `.env.example` file to `.env.local` and update the variables with your credentials.
+
+```bash
+cp .env.example .env.local
+```
+
+4. Set up the database:
+
+```bash
+npx prisma db push
+```
+
+5. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+terarchy/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── api/                # API routes
+│   │   ├── auth/               # Authentication pages
+│   │   ├── dashboard/          # Dashboard pages for different roles
+│   │   └── ...
+│   ├── components/             # Reusable React components
+│   ├── lib/                    # Utility functions and services
+│   │   └── api/                # API client setup (tRPC)
+│   └── server/                 # Server-side code
+│       ├── api/                # tRPC API routers
+│       ├── auth.ts             # Authentication configuration
+│       └── db/                 # Database client
+├── prisma/                     # Prisma ORM schema and migrations
+│   └── schema.prisma           # Database schema
+└── public/                     # Static assets
+    └── logos/                  # Logo files
+```
 
-## Learn More
+## User Roles and Workflows
 
-To learn more about Next.js, take a look at the following resources:
+### Supplier
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create and submit invoices for buyer approval
+2. Tokenize approved invoices
+3. Receive financing from financiers
+4. Track payment status
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Buyer
 
-## Deploy on Vercel
+1. Review and approve/reject invoices
+2. Track approved invoices
+3. Make payments to financiers or suppliers
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Financier
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Complete KYC/KYB/AML verification
+2. Browse tokenized invoices with risk assessments
+3. Finance invoices at competitive interest rates
+4. Receive repayments with interest
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+
+Built with ❤️ using Next.js, Prisma, tRPC, and NextAuth.
