@@ -6,12 +6,25 @@ import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+/**
+ * Sign In Page Component
+ *
+ * Provides dual authentication methods:
+ * 1. Email/password (credentials) authentication
+ * 2. Magic link (passwordless) authentication via email
+ *
+ * Includes error handling for authentication failures with user-friendly messages
+ * and loading states for better user experience.
+ *
+ * @returns {JSX.Element} The rendered sign-in page component
+ */
 export default function SignIn() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   const error = searchParams.get('error')
 
+  // Component state
   const [isLoading, setIsLoading] = useState(false)
   const [authType, setAuthType] = useState<'credentials' | 'email'>(
     'credentials'
@@ -21,17 +34,30 @@ export default function SignIn() {
     password: '',
   })
 
+  /**
+   * Handles form input changes
+   * Updates the form data state with the new input values
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event
+   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  /**
+   * Handles form submission for both authentication methods
+   * Manages error handling, loading states, and redirects
+   *
+   * @param {React.FormEvent} e - The form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
       if (authType === 'credentials') {
+        // Email/password authentication
         const result = await signIn('credentials', {
           redirect: false,
           email: formData.email,
@@ -40,24 +66,52 @@ export default function SignIn() {
         })
 
         if (!result?.error) {
+          // Successful authentication, redirect to intended destination
           router.push(callbackUrl)
         } else {
           console.error('Authentication error:', result.error)
+
+          // Handle different types of errors
+          if (result.error === 'CredentialsSignin') {
+            // Show the error inline (the error banner will display)
+            router.push(`/auth/signin?error=${result.error}`)
+          } else {
+            // For other errors, redirect to the error page
+            router.push(`/auth/error?error=${result.error}`)
+          }
+
           setIsLoading(false)
         }
       } else {
-        // Email sign in
-        await signIn('email', {
-          email: formData.email,
-          redirect: false,
-          callbackUrl,
-        })
+        // Email magic link authentication
+        try {
+          const result = await signIn('email', {
+            email: formData.email,
+            redirect: false,
+            callbackUrl,
+          })
 
-        // Redirect to check-email page
-        router.push('/auth/verify-request')
+          if (result?.error) {
+            console.error('Email sign in error:', result.error)
+            router.push(`/auth/error?error=${result.error}`)
+            setIsLoading(false)
+            return
+          }
+
+          // Successful magic link request, redirect to verification page
+          router.push(
+            `/auth/verify-request?email=${encodeURIComponent(formData.email)}`
+          )
+        } catch (emailError) {
+          console.error('Email sign in exception:', emailError)
+          router.push('/auth/error?error=EmailSignin')
+          setIsLoading(false)
+        }
       }
     } catch (error) {
+      // Handle unexpected errors
       console.error('Sign in error:', error)
+      router.push('/auth/error?error=Default')
       setIsLoading(false)
     }
   }
@@ -65,6 +119,7 @@ export default function SignIn() {
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full space-y-8'>
+        {/* Header and logo */}
         <div className='text-center'>
           <Link href='/' className='inline-block'>
             <Image
@@ -89,6 +144,7 @@ export default function SignIn() {
           </p>
         </div>
 
+        {/* Error message display */}
         {error && (
           <div className='rounded-md bg-red-50 p-4 mt-4'>
             <div className='flex'>
@@ -119,6 +175,7 @@ export default function SignIn() {
         )}
 
         <div className='mt-8 space-y-6'>
+          {/* Authentication type selector */}
           <div className='flex justify-center space-x-4'>
             <button
               type='button'

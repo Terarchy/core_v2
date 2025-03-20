@@ -5,7 +5,8 @@ import {
   protectedProcedure,
   adminProcedure,
 } from '@/server/api/trpc'
-import { KycStatus } from '@prisma/client'
+
+type KycStatus = 'PENDING' | 'IN_PROGRESS' | 'APPROVED' | 'REJECTED'
 
 export const kycRouter = createTRPCRouter({
   // Submit KYC/KYB documents
@@ -92,7 +93,7 @@ export const kycRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { limit, cursor, status } = input
 
-      const where: any = {}
+      const where: Record<string, unknown> = {}
       if (status !== 'ALL') {
         where.kycStatus = status
       }

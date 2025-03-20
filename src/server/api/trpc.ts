@@ -8,6 +8,7 @@ import { db } from '@/server/db'
 /**
  * 1. CONTEXT
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createTRPCContext = async (opts: {
   req: Request
   res: Response

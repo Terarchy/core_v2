@@ -54,18 +54,32 @@ export default function SignUp() {
     },
     onError: (error) => {
       console.error('Registration error:', error)
+
+      // Handle specific error cases
       if (error.message.includes('email already exists')) {
         setFormErrors((prev) => ({
           ...prev,
           email:
             'This email is already registered. Please use a different one or sign in.',
         }))
+      } else if (
+        error.message.includes('Prisma') ||
+        error.message.includes('database')
+      ) {
+        // Database errors should be handled by redirecting to the error page
+        router.push('/auth/error?error=EmailCreateAccount')
+        return
+      } else if (error.message.includes('sendVerificationRequest')) {
+        // Email sending errors
+        router.push('/auth/error?error=EmailSignin')
+        return
       } else {
         setFormErrors((prev) => ({
           ...prev,
           form: 'An error occurred during registration. Please try again.',
         }))
       }
+
       setIsLoading(false)
     },
   })
@@ -111,6 +125,8 @@ export default function SignUp() {
     }
 
     setIsLoading(true)
+    // Clear any previous form errors
+    setFormErrors({})
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...registrationData } = formData
@@ -119,6 +135,11 @@ export default function SignUp() {
       await registerMutation.mutateAsync(registrationData)
     } catch (error) {
       console.error('Registration submission error:', error)
+      // This catch block will handle any errors not caught by the mutation's onError
+      setFormErrors((prev) => ({
+        ...prev,
+        form: 'A network error occurred. Please check your connection and try again.',
+      }))
       setIsLoading(false)
     }
   }

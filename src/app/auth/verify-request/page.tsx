@@ -1,7 +1,14 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 export default function VerifyRequest() {
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email')
+  const error = searchParams.get('error')
+
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full space-y-8 text-center'>
@@ -19,9 +26,44 @@ export default function VerifyRequest() {
             Check your email
           </h2>
           <p className='mt-2 text-sm text-gray-600'>
-            A sign in link has been sent to your email address.
+            A sign in link has been sent to{' '}
+            {email ? (
+              <span className='font-medium'>{email}</span>
+            ) : (
+              'your email address'
+            )}
+            .
           </p>
         </div>
+
+        {error && (
+          <div className='rounded-md bg-red-50 p-4 mt-4'>
+            <div className='flex'>
+              <div className='flex-shrink-0'>
+                <svg
+                  className='h-5 w-5 text-red-400'
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 20 20'
+                  fill='currentColor'
+                  aria-hidden='true'
+                >
+                  <path
+                    fillRule='evenodd'
+                    d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+              </div>
+              <div className='ml-3'>
+                <h3 className='text-sm font-medium text-red-800'>
+                  {error === 'Throttle'
+                    ? 'Too many email requests. Please wait a few minutes before trying again.'
+                    : 'There was a problem sending the email. Please try again later.'}
+                </h3>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className='mt-8 bg-blue-50 p-6 rounded-lg shadow-sm'>
           <div className='flex justify-center mb-4'>
@@ -63,14 +105,16 @@ export default function VerifyRequest() {
               <span className='flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-blue-100 text-blue-500 mr-3 mt-0.5'>
                 3
               </span>
-              <span>You'll be redirected to your dashboard automatically.</span>
+              <span>
+                You&apos;ll be redirected to your dashboard automatically.
+              </span>
             </li>
           </ol>
         </div>
 
         <div className='mt-8'>
           <p className='text-sm text-gray-500'>
-            Didn't receive an email?{' '}
+            Didn&apos;t receive an email?{' '}
             <Link
               href='/auth/signin'
               className='font-medium text-blue-600 hover:text-blue-500'

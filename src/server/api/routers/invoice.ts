@@ -339,7 +339,7 @@ export const invoiceRouter = createTRPCRouter({
       const userRole = ctx.session.user.role
 
       // Build the where clause based on user role
-      let where: any = {}
+      const where: Record<string, unknown> = {}
 
       if (status !== 'ALL') {
         where.status = status
@@ -421,7 +421,7 @@ export const invoiceRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { limit, cursor, riskCategory } = input
 
-      const where: any = {
+      const where: Record<string, unknown> = {
         status: 'TOKENIZED',
       }
 
@@ -527,7 +527,9 @@ export const invoiceRouter = createTRPCRouter({
           invoiceId: invoiceId,
           financingId: financingId,
           payerId: ctx.session.user.id,
-          paymentType: paymentType as any,
+          paymentType: paymentType as
+            | 'BUYER_TO_SUPPLIER'
+            | 'BUYER_TO_FINANCIER',
         },
       })
 

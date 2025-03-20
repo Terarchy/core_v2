@@ -84,6 +84,62 @@ terarchy/
     └── logos/                  # Logo files
 ```
 
+## Testing
+
+Terarchy uses a comprehensive testing setup with Jest and React Testing Library to ensure code quality and reliability.
+
+### Testing Architecture
+
+```
+terarchy/
+├── __mocks__/                  # Global mocks for files and styles
+├── jest.config.js              # Jest configuration
+└── src/
+    └── __tests__/              # Test files
+        ├── auth/               # Authentication tests
+        ├── setup/              # Test setup utilities
+        └── setupTests.ts       # Test environment configuration
+```
+
+### Test Types
+
+- **Unit Tests**: Individual components and functions
+- **Integration Tests**: API routes and data flow
+- **Authentication Tests**: User authentication flows
+- **Email Tests**: Email delivery functionality
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (development)
+npm run test:watch
+
+# Generate test coverage report
+npm run test:coverage
+
+# Test email functionality
+npm run test:email
+```
+
+### Test Documentation
+
+All test files are thoroughly documented, explaining:
+
+- The purpose of each test suite
+- Testing methodologies used
+- Mock data and configurations
+- Expected behaviors
+
+### Key Testing Features
+
+- **Custom Render Function**: Wraps components with providers (SessionProvider, etc.)
+- **Mocked Authentication**: Pre-configured test user sessions
+- **Middleware Testing**: Route protection and role-based access
+- **Email Verification**: SendGrid integration tests
+
 ## User Roles and Workflows
 
 ### Supplier

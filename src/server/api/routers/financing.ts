@@ -1,10 +1,6 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  financierProcedure,
-} from '@/server/api/trpc'
+import { createTRPCRouter, financierProcedure } from '@/server/api/trpc'
 
 export const financingRouter = createTRPCRouter({
   // Finance an invoice (financier only)
@@ -124,7 +120,7 @@ export const financingRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { status, limit, cursor } = input
 
-      const where: any = {
+      const where: Record<string, unknown> = {
         financierId: ctx.session.user.id,
       }
 
