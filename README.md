@@ -166,6 +166,36 @@ All test files are thoroughly documented, explaining:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Deployment
+
+### Deploying to Netlify with Supabase
+
+Terarchy can be deployed to Netlify with a Supabase PostgreSQL database. Follow these steps for deployment:
+
+#### 1. Set Up Supabase
+
+1. Create an account on [Supabase](https://supabase.com)
+2. Create a new project
+3. Set up your database schema:
+   - Use the SQL file in `prisma/supabase-schema.sql` to create all tables and relationships
+   - Or use Prisma migrations with the Supabase connection string
+
+#### 2. Configure Netlify Deployment
+
+1. Create an account on [Netlify](https://netlify.com)
+2. Connect your GitHub repository
+3. Configure build settings:
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+4. Add environment variables:
+   - `DATABASE_URL`: Your Supabase connection string with pooling (e.g., `postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-ID].supabase.co:6543/postgres?pgbouncer=true`)
+   - `DIRECT_URL`: Your direct Supabase connection (e.g., `postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-ID].supabase.co:5432/postgres`)
+   - `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
+   - `NEXTAUTH_URL`: Your Netlify domain
+   - Email provider credentials if using magic links
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Acknowledgements
 
 Built with ❤️ using Next.js, Prisma, tRPC, and NextAuth.
