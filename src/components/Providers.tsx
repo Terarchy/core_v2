@@ -3,6 +3,8 @@
 import { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 import { TRPCProvider } from '@/lib/api/trpc'
+import { Toaster } from '@/components/ui/sonner'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 export default function Providers({
   children,
@@ -12,8 +14,13 @@ export default function Providers({
   session: Session | null
 }) {
   return (
-    <SessionProvider session={session}>
-      <TRPCProvider>{children}</TRPCProvider>
-    </SessionProvider>
+    <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+      <SessionProvider session={session}>
+        <TRPCProvider>
+          {children}
+          <Toaster />
+        </TRPCProvider>
+      </SessionProvider>
+    </ThemeProvider>
   )
 }

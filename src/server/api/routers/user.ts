@@ -10,13 +10,13 @@ import { TRPCError } from '@trpc/server'
 import { UserRole } from '@prisma/client'
 
 export const userRouter = createTRPCRouter({
-  // Create a new user
+  // Register new user
   register: publicProcedure
     .input(
       z.object({
+        name: z.string().min(1),
         email: z.string().email(),
         password: z.string().min(8),
-        name: z.string().min(1),
         role: z.enum(['SUPPLIER', 'BUYER', 'FINANCIER']),
         companyName: z.string().optional(),
         companyRegistrationNo: z.string().optional(),
@@ -26,6 +26,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Check if user already exists
       const existingUser = await ctx.db.user.findUnique({
         where: { email: input.email },
       })
@@ -38,7 +39,6 @@ export const userRouter = createTRPCRouter({
       }
 
       const hashedPassword = await bcrypt.hash(input.password, 10)
-
       return ctx.db.user.create({
         data: {
           email: input.email,
@@ -62,23 +62,19 @@ export const userRouter = createTRPCRouter({
       })
     }),
 
-  // Get the current user's profile
-  getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
+  // Get user settings
+  getSettings: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
       select: {
         id: true,
         name: true,
         email: true,
-        role: true,
         companyName: true,
-        companyRegistrationNo: true,
         phoneNumber: true,
-        address: true,
         country: true,
-        kycStatus: true,
-        emailVerified: true,
-        createdAt: true,
+        notificationsEnabled: true,
+        twoFactorEnabled: true,
       },
     })
 
@@ -92,45 +88,96 @@ export const userRouter = createTRPCRouter({
     return user
   }),
 
-  // Update user profile
-  updateProfile: protectedProcedure
+  // Update user settings
+  updateSettings: protectedProcedure
     .input(
       z.object({
-        name: z.string().optional(),
-        companyName: z.string().optional(),
-        companyRegistrationNo: z.string().optional(),
-        phoneNumber: z.string().optional(),
-        address: z.string().optional(),
-        country: z.string().optional(),
+        name: z.string().min(1).optional(),
+        companyName: z.string().min(1).optional(),
+        phoneNumber: z.string().min(1).optional(),
+        country: z.string().min(1).optional(),
+        notificationsEnabled: z.boolean().optional(),
+        twoFactorEnabled: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.user.update({
+      const user = await ctx.db.user.update({
         where: { id: ctx.session.user.id },
-        data: {
-          ...input,
-        },
+        data: input,
         select: {
           id: true,
           name: true,
           email: true,
-          role: true,
           companyName: true,
-          companyRegistrationNo: true,
           phoneNumber: true,
-          address: true,
           country: true,
+          notificationsEnabled: true,
+          twoFactorEnabled: true,
         },
       })
+
+      return user
     }),
 
-  // Admin: Get all users (with pagination)
+  // Get all buyers (admin and supplier only)
+  getBuyers: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(10),
+        cursor: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // Check if user is admin or supplier
+      if (
+        ctx.session.user.role !== 'ADMIN' &&
+        ctx.session.user.role !== 'SUPPLIER'
+      ) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Only admins and suppliers can view buyers',
+        })
+      }
+
+      const { limit, cursor } = input
+
+      const buyers = await ctx.db.user.findMany({
+        take: limit + 1,
+        where: {
+          role: 'BUYER',
+        },
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          companyName: true,
+          phoneNumber: true,
+          country: true,
+          createdAt: true,
+        },
+      })
+
+      let nextCursor: typeof cursor = undefined
+      if (buyers.length > limit) {
+        const nextItem = buyers.pop()
+        nextCursor = nextItem?.id
+      }
+
+      return {
+        buyers,
+        nextCursor,
+      }
+    }),
+
+  // Admin: Get all users
   getAllUsers: adminProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100).default(10),
         cursor: z.string().nullish(),
-        role: z.enum(['SUPPLIER', 'BUYER', 'FINANCIER', 'ADMIN']).optional(),
+        role: z.enum(['ADMIN', 'SUPPLIER', 'BUYER', 'FINANCIER']).optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -138,7 +185,7 @@ export const userRouter = createTRPCRouter({
 
       const users = await ctx.db.user.findMany({
         take: limit + 1,
-        where: role ? { role: role as UserRole } : undefined,
+        where: role ? { role } : undefined,
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: { createdAt: 'desc' },
         select: {
@@ -147,7 +194,8 @@ export const userRouter = createTRPCRouter({
           email: true,
           role: true,
           companyName: true,
-          kycStatus: true,
+          phoneNumber: true,
+          country: true,
           createdAt: true,
         },
       })
@@ -162,5 +210,53 @@ export const userRouter = createTRPCRouter({
         users,
         nextCursor,
       }
+    }),
+
+  // Admin: Update user role
+  updateUserRole: adminProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        role: z.enum(['ADMIN', 'SUPPLIER', 'BUYER', 'FINANCIER']),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.update({
+        where: { id: input.userId },
+        data: { role: input.role },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyName: true,
+          phoneNumber: true,
+          country: true,
+          createdAt: true,
+        },
+      })
+
+      return user
+    }),
+
+  // Admin: Delete user
+  deleteUser: adminProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.delete({
+        where: { id: input.userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyName: true,
+          phoneNumber: true,
+          country: true,
+          createdAt: true,
+        },
+      })
+
+      return user
     }),
 })
