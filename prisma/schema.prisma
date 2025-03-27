@@ -130,6 +130,7 @@ model Invoice {
   dueDate          DateTime
   description      String?
   status           InvoiceStatus  @default(DRAFT)
+  rejectionReason  String?        // Reason for invoice rejection
   
   // Risk assessment
   riskScore        Decimal?       @db.Decimal(5, 2)

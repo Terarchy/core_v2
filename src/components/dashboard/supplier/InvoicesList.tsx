@@ -23,7 +23,6 @@ import {
   ShieldCheckIcon,
   AlertCircleIcon,
   CheckCircleIcon,
-  EyeIcon,
 } from 'lucide-react'
 import { api } from '@/lib/api/trpc'
 import { toast } from 'sonner'
