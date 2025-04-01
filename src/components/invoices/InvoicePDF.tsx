@@ -1,37 +1,25 @@
-import { Decimal } from '@prisma/client/runtime/library'
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 
-// Register a font (optional)
-Font.register({
-  family: 'Inter',
-  src: 'https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2',
-})
-
-// Create styles
+// Create styles with basic fonts and explicit colors
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#ffffff',
     padding: 30,
-    fontFamily: 'Inter',
+    fontFamily: 'Helvetica',
+    color: '#000000',
   },
   header: {
     marginBottom: 20,
     borderBottom: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#000000',
     paddingBottom: 20,
   },
   title: {
     fontSize: 24,
     marginBottom: 10,
     fontWeight: 'bold',
+    color: '#000000',
   },
   section: {
     marginBottom: 20,
@@ -40,6 +28,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#000000',
   },
   row: {
     flexDirection: 'row',
@@ -48,16 +37,17 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#6b7280',
+    color: '#000000',
   },
   value: {
     fontSize: 12,
     fontWeight: 'bold',
+    color: '#000000',
   },
   total: {
     marginTop: 20,
     borderTop: 1,
-    borderTopColor: '#e5e7eb',
+    borderTopColor: '#000000',
     paddingTop: 20,
   },
   totalRow: {
@@ -68,35 +58,37 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#000000',
   },
   totalValue: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#000000',
   },
 })
 
 interface InvoicePDFProps {
   invoice: {
     invoiceNumber: string
-    amount: Decimal
+    amount: number
     currency: string
     issueDate: Date
     dueDate: Date
-    description?: string | null
+    description?: string
     supplier: {
-      name: string | null
-      companyName?: string | null
-      email: string | null
+      name: string
+      companyName?: string
+      email: string
     }
   }
 }
 
-export const InvoicePDF = ({ invoice }: InvoicePDFProps) => {
+export function InvoicePDF({ invoice }: InvoicePDFProps) {
   return (
     <Document>
       <Page size='A4' style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>Invoice</Text>
+          <Text style={styles.title}>INVOICE</Text>
         </View>
 
         <View style={styles.section}>
@@ -147,7 +139,7 @@ export const InvoicePDF = ({ invoice }: InvoicePDFProps) => {
               {new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: invoice.currency,
-              }).format(Number(invoice.amount))}
+              }).format(invoice.amount)}
             </Text>
           </View>
         </View>

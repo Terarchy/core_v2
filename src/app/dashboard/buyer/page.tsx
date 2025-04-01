@@ -8,6 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/api/trpc'
 import { formatCurrency } from '@/lib/utils'
 
+/**
+ * Buyer Dashboard
+ * 
+ * This is the main dashboard for buyers. It displays the total number of invoices, pending invoices, and the total amount of invoices.
+ * It also displays the recent invoices.
+ * 
+ */
 export default function BuyerDashboard() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -154,7 +161,6 @@ export default function BuyerDashboard() {
                           </div>
                         </div>
                       </Link>
-                      
                     ))}
                   </div>
                 )}

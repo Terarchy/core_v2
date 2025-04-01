@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -15,18 +15,24 @@ import { api } from '@/lib/api/trpc'
 import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
 
-export default function InvoiceDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+/**
+ * Invoice Detail Page
+ * 
+ * This page displays the details of an invoice.
+ * It allows the buyer to approve or reject the invoice.
+ * 
+ */
+export default function InvoiceDetailPage() {
   const router = useRouter()
+  const params = useParams()
+  const invoiceId = params.id as string
   const [reason, setReason] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: invoice, isLoading: isLoadingInvoice } = api.buyer.getInvoice.useQuery({
-    id: params.id,
-  })
+  const { data: invoice, isLoading: isLoadingInvoice } =
+    api.buyer.getInvoice.useQuery({
+      id: invoiceId,
+    })
 
   const approveMutation = api.buyer.approveInvoice.useMutation({
     onSuccess: () => {
@@ -55,7 +61,7 @@ export default function InvoiceDetailPage({
   const handleApprove = async () => {
     setIsLoading(true)
     try {
-      await approveMutation.mutateAsync({ id: params.id })
+      await approveMutation.mutateAsync({ id: invoiceId })
     } finally {
       setIsLoading(false)
     }
@@ -70,7 +76,7 @@ export default function InvoiceDetailPage({
     setIsLoading(true)
     try {
       await rejectMutation.mutateAsync({
-        id: params.id,
+        id: invoiceId,
         reason,
       })
     } finally {
@@ -80,7 +86,7 @@ export default function InvoiceDetailPage({
 
   const handleDownload = async () => {
     try {
-      const response = await fetch(`/api/invoices/${params.id}/pdf`)
+      const response = await fetch(`/api/invoices/${invoiceId}/pdf`)
       if (!response.ok) {
         throw new Error('Failed to download PDF')
       }
@@ -96,11 +102,7 @@ export default function InvoiceDetailPage({
       document.body.removeChild(a)
     } catch (error) {
       console.error('Download error:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to download invoice PDF',
-        variant: 'destructive',
-      })
+      toast.error('Failed to download invoice PDF')
     }
   }
 
@@ -139,7 +141,9 @@ export default function InvoiceDetailPage({
             </CardHeader>
             <CardContent className='space-y-4'>
               <div>
-                <div className='text-sm font-medium text-gray-500'>Invoice Number</div>
+                <div className='text-sm font-medium text-gray-500'>
+                  Invoice Number
+                </div>
                 <div className='mt-1'>{invoice.invoiceNumber}</div>
               </div>
               <div>
@@ -151,19 +155,25 @@ export default function InvoiceDetailPage({
                 <div className='mt-1'>{invoice.status}</div>
               </div>
               <div>
-                <div className='text-sm font-medium text-gray-500'>Created At</div>
+                <div className='text-sm font-medium text-gray-500'>
+                  Created At
+                </div>
                 <div className='mt-1'>
                   {new Date(invoice.createdAt).toLocaleDateString()}
                 </div>
               </div>
               <div>
-                <div className='text-sm font-medium text-gray-500'>Due Date</div>
+                <div className='text-sm font-medium text-gray-500'>
+                  Due Date
+                </div>
                 <div className='mt-1'>
                   {new Date(invoice.dueDate).toLocaleDateString()}
                 </div>
               </div>
               <div>
-                <div className='text-sm font-medium text-gray-500'>Description</div>
+                <div className='text-sm font-medium text-gray-500'>
+                  Description
+                </div>
                 <div className='mt-1'>{invoice.description}</div>
               </div>
             </CardContent>
@@ -177,11 +187,17 @@ export default function InvoiceDetailPage({
             </CardHeader>
             <CardContent className='space-y-4'>
               <div>
-                <div className='text-sm font-medium text-gray-500'>Company Name</div>
-                <div className='mt-1'>{invoice.supplier.companyName || invoice.supplier.name}</div>
+                <div className='text-sm font-medium text-gray-500'>
+                  Company Name
+                </div>
+                <div className='mt-1'>
+                  {invoice.supplier.companyName || invoice.supplier.name}
+                </div>
               </div>
               <div>
-                <div className='text-sm font-medium text-gray-500'>Contact Name</div>
+                <div className='text-sm font-medium text-gray-500'>
+                  Contact Name
+                </div>
                 <div className='mt-1'>{invoice.supplier.name}</div>
               </div>
               <div>
@@ -233,4 +249,4 @@ export default function InvoiceDetailPage({
       </div>
     </div>
   )
-} 
+}
