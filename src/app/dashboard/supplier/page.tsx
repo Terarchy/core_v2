@@ -76,9 +76,9 @@ export default function SupplierDashboard() {
     invoicesData?.invoices.filter(
       (invoice) => invoice.status === 'PENDING_APPROVAL'
     ) || []
-  const verifiedInvoices =
-    invoicesData?.invoices.filter((invoice) => invoice.status === 'VERIFIED') ||
-    []
+  // const verifiedInvoices =
+  //   invoicesData?.invoices.filter((invoice) => invoice.status === 'VERIFIED') ||
+  //   []
   const tokenizedInvoices =
     invoicesData?.invoices.filter(
       (invoice) => invoice.status === 'TOKENIZED'
@@ -219,7 +219,18 @@ export default function SupplierDashboard() {
                   </div>
                 ) : (
                   <InvoicesList
-                    invoices={invoicesData?.invoices || []}
+                    invoices={(invoicesData?.invoices || []).map((invoice) => ({
+                      ...invoice,
+                      amount: Number(invoice.amount),
+                      issueDate: new Date(invoice.issueDate),
+                      dueDate: new Date(invoice.dueDate),
+                      description: invoice.description || undefined,
+                      buyer: {
+                        ...invoice.buyer,
+                        name: invoice.buyer.name || undefined,
+                        companyName: invoice.buyer.companyName || undefined,
+                      },
+                    }))}
                     onCreateNew={() => setIsCreatingInvoice(true)}
                   />
                 )}

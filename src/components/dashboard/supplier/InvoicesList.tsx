@@ -63,7 +63,7 @@ export default function InvoicesList({
   onCreateNew,
 }: InvoicesListProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
-  const utils = api.useContext()
+  const utils = api.useUtils()
 
   // Submit invoice for approval
   const submitInvoiceMutation = api.invoice.submitInvoice.useMutation({
@@ -107,6 +107,10 @@ export default function InvoicesList({
         break
       case 'tokenize':
         tokenizeInvoiceMutation.mutate({ invoiceId: invoice.id })
+        break
+      case 'edit':
+        // Redirect to the edit page
+        window.location.href = `/dashboard/supplier/invoices/edit/${invoice.id}`
         break
       default:
         break
@@ -175,6 +179,8 @@ export default function InvoicesList({
       actions.push({ label: 'Submit for Approval', action: 'submit' })
     } else if (invoice.status === 'VERIFIED') {
       actions.push({ label: 'Tokenize Invoice', action: 'tokenize' })
+    } else if (invoice.status === 'REJECTED') {
+      actions.push({ label: 'Edit Invoice', action: 'edit' })
     }
 
     return actions

@@ -239,6 +239,7 @@ export default function InvoiceDetailPage() {
                   onClick={handleReject}
                   disabled={isLoading}
                   variant='destructive'
+                  className='text-white'
                 >
                   Reject Invoice
                 </Button>

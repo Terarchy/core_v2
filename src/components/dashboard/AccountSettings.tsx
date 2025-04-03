@@ -24,7 +24,7 @@ type UserSettings = {
 }
 
 export default function AccountSettings() {
-  const utils = api.useContext()
+  const utils = api.useUtils()
 
   // Fetch user settings
   const { data: settings, isLoading: isLoadingSettings } =
