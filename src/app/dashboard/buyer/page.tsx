@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/api/trpc'
@@ -16,25 +15,25 @@ import { formatCurrency } from '@/lib/utils'
  * 
  */
 export default function BuyerDashboard() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  // const router = useRouter()
+  // const [isLoading, setIsLoading] = useState(false)
 
   // Fetch buyer-specific data
   const { data: stats } = api.buyer.getStats.useQuery()
   const { data: recentInvoices, isLoading: isLoadingInvoices } =
     api.buyer.getRecentInvoices.useQuery()
 
-  const handleLogout = async () => {
-    setIsLoading(true)
-    try {
-      await api.auth.logout.useMutation().mutateAsync()
-      router.push('/auth/signin')
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  // const handleLogout = async () => {
+  //   setIsLoading(true)
+  //   try {
+  //     await api.auth.logout.useMutation().mutateAsync()
+  //     router.push('/auth/signin')
+  //   } catch (error) {
+  //     console.error('Logout error:', error)
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -46,19 +45,14 @@ export default function BuyerDashboard() {
               <h1 className='text-3xl font-bold'>Buyer Dashboard</h1>
             </div>
             <div className='flex items-center space-x-4'>
-              <Link href='/dashboard/buyer/account'>
-                <Button variant='ghost' size='sm'>
-                  Account Settings
-                </Button>
-              </Link>
-              <Button
+              {/* <Button
                 variant='outline'
                 size='sm'
                 onClick={handleLogout}
                 disabled={isLoading}
               >
                 Logout
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@
  * @param date - Date to format
  * @returns Formatted date string in local format
  */
-export function formatDate(date: Date): string {
+export function formatDate(date: string | Date): string {
   if (!(date instanceof Date) && typeof date === 'string') {
     date = new Date(date)
   }

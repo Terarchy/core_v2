@@ -14,6 +14,16 @@ import {
 import { toast } from 'sonner'
 import { api } from '@/lib/api/trpc'
 
+type UserProps = {
+  user?: {
+    id: string
+    name?: string | null
+    email?: string | null
+    role?: string
+    image?: string | null
+  }
+}
+
 type UserSettings = {
   email: string
   name: string
@@ -23,7 +33,7 @@ type UserSettings = {
   twoFactorEnabled: boolean
 }
 
-export default function AccountSettings() {
+export default function AccountSettings({ user }: UserProps) {
   const utils = api.useUtils()
 
   // Fetch user settings
@@ -34,8 +44,8 @@ export default function AccountSettings() {
     })
 
   const [formData, setFormData] = useState<UserSettings>({
-    email: '',
-    name: '',
+    email: user?.email || '',
+    name: user?.name || '',
     companyName: '',
     phoneNumber: '',
     notificationsEnabled: true,

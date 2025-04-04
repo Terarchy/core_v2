@@ -124,7 +124,8 @@ export default function InvoicesList({
       {
         variant: 'default' | 'secondary' | 'destructive' | 'outline' | null
         label: string
-        icon?: React.ReactNode
+        icon?: React.ReactNode,
+        className?: string
       }
     > = {
       DRAFT: {
@@ -139,29 +140,31 @@ export default function InvoicesList({
       },
       REJECTED: { variant: 'destructive', label: 'Rejected' },
       VERIFIED: {
-        variant: 'default',
+        variant: 'outline',
         label: 'Verified',
         icon: <CheckCircleIcon className='h-3 w-3 mr-1' />,
+        className: 'bg-green-50 text-green-700',
       },
       TOKENIZED: {
         variant: 'default',
         label: 'Tokenized',
         icon: <ShieldCheckIcon className='h-3 w-3 mr-1' />,
+        className: 'bg-amber-500 text-white',
       },
-      PARTIALLY_FINANCED: { variant: 'default', label: 'Partially Financed' },
-      FULLY_FINANCED: { variant: 'default', label: 'Fully Financed' },
-      PARTIALLY_PAID: { variant: 'default', label: 'Partially Paid' },
-      PAID: { variant: 'default', label: 'Paid' },
+      PARTIALLY_FINANCED: { variant: 'default', label: 'Partially Financed', className: 'bg-blue-400 text-white' },
+      FULLY_FINANCED: { variant: 'default', label: 'Fully Financed', className: 'bg-blue-500 text-white' },
+      PARTIALLY_PAID: { variant: 'default', label: 'Partially Paid', className: 'bg-lime-500 text-white' },
+      PAID: { variant: 'default', label: 'Paid', className: 'bg-green-500 text-white' },
       OVERDUE: { variant: 'destructive', label: 'Overdue' },
     }
 
-    const { variant, label, icon } = statusMap[status] || {
+    const { variant, label, icon, className } = statusMap[status] || {
       variant: 'outline',
       label: status,
     }
 
     return (
-      <Badge variant={variant}>
+      <Badge variant={variant} className={className}>
         {icon && icon}
         {label}
       </Badge>
